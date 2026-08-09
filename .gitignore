@@ -1,0 +1,53 @@
+# ==========================================
+# Secrets and credentials
+# ==========================================
+.env
+.env.*
+*.key
+*.pem
+
+# ==========================================
+# Python
+# ==========================================
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# ==========================================
+# Jupyter
+# ==========================================
+.ipynb_checkpoints/
+
+# ==========================================
+# Biomedical / project data
+# ==========================================
+data/raw/
+data/processed/
+data/private/
+data/sensitive/
+
+# Common data files - do not upload by default
+*.csv
+*.xlsx
+*.xls
+*.parquet
+
+# ==========================================
+# Databricks / local configuration
+# ==========================================
+.databricks/
+databrickscfg
+.databrickscfg
+
+# ==========================================
+# VS Code local settings
+# ==========================================
+.vscode/
+
+# ==========================================
+# Operating system
+# ==========================================
+.DS_Store
+Thumbs.db
