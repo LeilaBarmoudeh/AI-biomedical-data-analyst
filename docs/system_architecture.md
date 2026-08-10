@@ -1,6 +1,6 @@
-# System Architecture#
+# System Architecture #
 
-# 1. Purpose#
+# 1. Purpose #
 
 The purpose of the system is to develop a prototype AI Data Analyst that supports researchers across key stages of the biomedical data
 analytics lifecycle.
@@ -10,42 +10,44 @@ tools, and a Large Language Model to support data preparation,
 analysis, visualization, and reporting while maintaining human
 oversight.
 
-# 2. High-Level Architecture#
+# 2. High-Level Architecture #
+```text
 
-Biomedical Data
-        |
-        v
-Databricks
-        |
-        |-- Data ingestion
-        |-- Data quality
-        |-- Cleaning
-        |-- Preprocessing
-        |-- Feature engineering
-        |
-        v
-AI Data Analyst
-(Python application developed in VS Code)
-        |
-        |-- LLM reasoning
-        |-- Tool selection
-        |-- Statistical analysis
-        |-- Interpretation
-        |-- Report generation
-        |
-        v
-Power BI
-        |
-        |-- Dashboard
-        |-- Visualization
-        |-- KPI reporting
-        |
-        v
-Researcher Review
 
-# 3. Development Environment#
+                        GitHub
+                  Version control
+                        ↑ ↓
+               VS Code + Copilot
+                  Agent development
+                        |
+                        v
+                AI DATA ANALYST
+                 Orchestration Layer
+                        |
+        -----------------------------------
+        |                |                |
+        v                v                v
+   Databricks          LLM API         Power BI
+        |                |                |
+ Data ingestion       Reasoning        Dashboard
+ Cleaning             Planning         Visualization
+ Preprocessing        Interpretation   Reporting
+ Feature engineering
+ Statistics / ML
+ MLflow
+        |
+        v
+   Structured Results
+        |
+        └───────────────→ AI Agent
+                              |
+                              v
+                       Researcher Review
 
-# VS Code#
+```
+# 3. Development Environment #
+
+# VS Code #
 Main software development environment.
 
 # GitHub#
