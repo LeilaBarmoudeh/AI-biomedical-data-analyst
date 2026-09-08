@@ -200,20 +200,215 @@ More details are available in:
 
 ---
 
-## Current Status
+## Current Pipeline
 
-**Project status: In development**
+### 1. Data Understanding and Quality Assessment
 
-Current work focuses on:
+The pipeline performs automated checks including:
 
-- project architecture
-- reproducible Python environment
-- preparation of the HCC use case
-- development of the first data-quality module
+- Dataset dimensions
+- Numeric type validation
+- Duplicate identifiers
+- Duplicate sample names
+- Missing-value assessment
+- Fully missing features
+- Constant features
+- Basic distribution statistics
 
-Azure Databricks integration will be added once the required workspace
-access is available.
+The reusable implementation is located in:
 
+```text
+src/data_quality/
+```
+
+### 2. Missingness Analysis and Preprocessing
+
+Feature-level and sample-level missingness are evaluated before imputation.
+
+Features with more than **30% missing values** are removed.
+
+For the current proteomics dataset:
+
+| Metric | Result |
+|---|---:|
+| Original proteins | 11,175 |
+| Retained proteins | 8,368 |
+| Removed proteins | 2,807 |
+| Remaining missingness | 2.37% |
+
+The relationship between protein abundance and missingness is also assessed using Spearman correlation.
+
+Observed correlation:
+
+```text
+Spearman rho ≈ -0.605
+```
+
+This indicates a substantial abundance-associated missingness pattern: lower-abundance proteins tend to have more missing observations. This association is treated as a diagnostic rather than proof of a specific missing-data mechanism.
+
+### 3. Imputation Evaluation
+
+Imputation methods are evaluated using artificial masking of observed values.
+
+The validation workflow is:
+
+```text
+Observed Data
+      ↓
+Artificially Mask Known Values
+      ↓
+Apply Imputation
+      ↓
+Compare Imputed vs True Values
+      ↓
+MAE / RMSE
+```
+
+This makes it possible to evaluate imputation performance objectively because the true values of the artificially masked observations are known.
+
+### 4. Median Imputation Baseline
+
+Median imputation is used as the baseline method.
+
+Current validation performance:
+
+| Method | MAE | RMSE |
+|---|---:|---:|
+| Median | 0.2068 | 0.3105 |
+
+### 5. Automated KNN Imputation
+
+Rather than fixing the number of neighbors manually, the pipeline automatically evaluates candidate values of `k`.
+
+Candidate values are generated according to the number of samples and evaluated using repeated artificial-masking experiments.
+
+For the current dataset, repeated validation selected:
+
+```text
+Optimal k = 5
+```
+
+Performance across five validation runs:
+
+| k | Mean MAE | Mean RMSE | RMSE SD |
+|---:|---:|---:|---:|
+| **5** | **0.1580** | **0.2417** | **0.0011** |
+| 7 | 0.1586 | 0.2423 | 0.0011 |
+| 9 | 0.1602 | 0.2448 | 0.0011 |
+| 11 | 0.1618 | 0.2474 | 0.0012 |
+| 3 | 0.1621 | 0.2482 | 0.0018 |
+| 12 | 0.1626 | 0.2486 | 0.0012 |
+
+KNN currently outperforms the median baseline under random-masking validation.
+
+Importantly, the selected value of `k` is **dataset-dependent**. The pipeline therefore performs automatic validation rather than permanently setting `k=5`.
+
+## Repository Structure
+
+```text
+ai-analytics-agent/
+│
+├── data/
+│   ├── raw/
+│   ├── interim/
+│   └── processed/
+│
+├── notebooks/
+│   ├── 01_data_understanding.ipynb
+│   ├── 02_preprocessing.ipynb
+│   └── 03_imputation_evaluation.ipynb
+│
+├── src/
+│   ├── data_quality/
+│   │   └── quality_checker.py
+│   │
+│   ├── preprocessing/
+│   │   └── preprocessing.py
+│   │
+│   └── imputation/
+│       └── imputation.py
+│
+├── tests/
+│
+├── requirements.txt
+├── .gitignore
+└── README.md
+```
+
+## Design Principle
+
+The project separates exploratory notebooks from reusable analytical components.
+
+**Notebooks** are used for:
+
+- Exploration
+- Visualization
+- Interpretation
+- Experimental validation
+
+**Python modules** contain reusable functions that can eventually be called by the AI Data Analyst.
+
+This separation is intended to make the workflow reproducible, testable, and suitable for future automation.
+
+## Technology Stack
+
+- Python
+- Pandas
+- NumPy
+- scikit-learn
+- Jupyter
+- Git / GitHub
+- Azure Databricks
+- MLflow
+- Power BI
+- LLM integration (planned)
+
+## Current Development Status
+
+Completed:
+
+- Data-quality framework
+- Numeric validation
+- Missingness analysis
+- Sparse-feature filtering
+- Median imputation
+- Artificial-masking validation framework
+- MAE/RMSE evaluation
+- KNN imputation
+- Automatic KNN hyperparameter selection
+- Repeated validation across random masks
+
+In progress / planned:
+
+- Additional imputation strategies
+- Automated comparison of imputation methods
+- Statistical analysis modules
+- MLflow experiment tracking
+- Azure Databricks integration
+- AI Data Analyst orchestration
+- LLM-based analytical reasoning
+- Power BI reporting
+- Human-in-the-loop analytical review
+
+## Project Goal
+
+The final system aims to support a workflow in which an AI assistant can:
+
+1. Inspect incoming data.
+2. Identify data-quality problems.
+3. Recommend appropriate preprocessing strategies.
+4. Evaluate alternative analytical methods.
+5. Execute approved analytical tools.
+6. Explain results and methodological choices.
+7. Generate structured outputs for reporting and visualization.
+
+The objective is **AI-assisted analytics rather than autonomous decision-making**: analytical recommendations remain transparent and subject to human review.
+
+## Status
+
+ **Active development — 2026**
+
+This repository currently represents an evolving research and portfolio prototype.
 ---
 
 ## Repository Structure
